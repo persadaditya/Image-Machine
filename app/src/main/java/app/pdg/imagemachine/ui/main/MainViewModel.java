@@ -15,17 +15,13 @@ import app.pdg.imagemachine.data.repo.DataRepo;
 
 public class MainViewModel extends AndroidViewModel {
     private final DataRepo dataRepo;
-    private SessionHandler sessionHandler;
-
-    private LiveData<List<Machine>> machineList;
+    private final LiveData<List<Machine>> machineList;
 
 
     public MainViewModel(@NonNull Application application) {
         super(application);
 
-        sessionHandler = ((BaseApp)application).getSession();
         dataRepo = ((BaseApp)application).getRepo();
-
         machineList = dataRepo.getMachineList();
 
     }

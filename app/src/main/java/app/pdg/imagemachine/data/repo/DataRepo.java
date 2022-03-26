@@ -88,7 +88,6 @@ public class DataRepo {
     }
 
     public void insertMachine(Machine machine){
-        Log.d("aap", "insertMachine:" + machine.getId().toString());
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -99,7 +98,6 @@ public class DataRepo {
 
 
     public void updateMachine(Machine machine){
-        Log.d("aap", "updateMachine:" + machine.getId().toString());
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
