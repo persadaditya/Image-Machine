@@ -25,17 +25,9 @@ public class DataRepo {
         mObservableMachine = new MediatorLiveData<>();
 
         if(session.isSortByNameMode()){
-            mObservableMachine.addSource(database.machineDao().getMachineListByName(), data-> {
-                if(myDatabase.getDatabaseCreated().getValue()!=null){
-                    mObservableMachine.postValue(data);
-                }
-            });
+            loadMachineListByName();
         } else {
-            mObservableMachine.addSource(database.machineDao().getMachineListByType(), data-> {
-                if(myDatabase.getDatabaseCreated().getValue()!=null){
-                    mObservableMachine.postValue(data);
-                }
-            });
+            loadMachineListByType();
         }
 
     }
@@ -53,6 +45,22 @@ public class DataRepo {
 
     public LiveData<List<Machine>> getMachineList(){
         return mObservableMachine;
+    }
+
+    public void loadMachineListByName(){
+        mObservableMachine.addSource(myDatabase.machineDao().getMachineListByName(), data-> {
+            if(myDatabase.getDatabaseCreated().getValue()!=null){
+                mObservableMachine.postValue(data);
+            }
+        });
+    }
+
+    public void loadMachineListByType(){
+        mObservableMachine.addSource(myDatabase.machineDao().getMachineListByType(), data-> {
+            if(myDatabase.getDatabaseCreated().getValue()!=null){
+                mObservableMachine.postValue(data);
+            }
+        });
     }
 
     public LiveData<List<Machine>> getMachineListByName(){

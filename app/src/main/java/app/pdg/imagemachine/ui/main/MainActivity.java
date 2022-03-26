@@ -1,6 +1,7 @@
 package app.pdg.imagemachine.ui.main;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements MachineAdapter.Ma
     private ActivityMainBinding binding;
     public static final int CAMERA_PERMISSION = 101;
     public static final int READ_EXTERNAL_PERMISSION = 102;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements MachineAdapter.Ma
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
 
-        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         binding.fab.setOnClickListener(view -> {
             if(ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -109,9 +112,30 @@ public class MainActivity extends AppCompatActivity implements MachineAdapter.Ma
                 startActivity(new Intent(getApplicationContext(), AddEditMachineActivity.class));
             }
         } else if(item.getItemId() == R.id.action_sort){
-            //TODO: build dialog to choose sort between name and type
+            //DONE: build dialog to choose sort between name and type
+            String[] sorts = {"Name", "Type"};
             SessionHandler session = ((BaseApp)getApplication()).getSession();
-            Toast.makeText(getApplicationContext(), "Not yet implemented: Name Sort=" + session.isSortByNameMode(), Toast.LENGTH_SHORT).show();
+            int checkItem = session.isSortByNameMode() ? 0 : 1; //if name true select 0
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Sort Mode");
+            builder.setSingleChoiceItems(sorts, checkItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if(i==0){
+                        //sort by name
+                        session.setSortMode(true);
+                        viewModel.loadMachineByName();
+                    } else if(i==1){
+                        //sort by type
+                        session.setSortMode(false);
+                        viewModel.loadMachineByType();
+                    }
+                    dialogInterface.dismiss();
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);

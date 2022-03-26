@@ -17,7 +17,7 @@ public class MainViewModel extends AndroidViewModel {
     private final DataRepo dataRepo;
     private SessionHandler sessionHandler;
 
-    private final LiveData<List<Machine>> machineList;
+    private LiveData<List<Machine>> machineList;
 
 
     public MainViewModel(@NonNull Application application) {
@@ -28,17 +28,18 @@ public class MainViewModel extends AndroidViewModel {
 
         machineList = dataRepo.getMachineList();
 
-//        if(sessionHandler.isSortByNameMode()){
-//            machineList = dataRepo.getMachineListByName();
-//        } else {
-//            machineList = dataRepo.getMachineListByType();
-//        }
-
     }
 
     public LiveData<List<Machine>> getMachineList() {
         return machineList;
     }
 
+    public void loadMachineByName(){
+        dataRepo.loadMachineListByName();
+    }
+
+    public void loadMachineByType(){
+        dataRepo.loadMachineListByType();
+    }
 
 }
