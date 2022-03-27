@@ -1,18 +1,28 @@
 package app.pdg.imagemachine.ui.detail;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +33,7 @@ import app.pdg.imagemachine.data.model.Machine;
 import app.pdg.imagemachine.databinding.ActivityDetailBinding;
 import app.pdg.imagemachine.ui.addedit.AddEditMachineActivity;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements ImageDetailAdapter.ImageUriCallback {
     public static final String MACHINE_ID = "dataMachineIdKey";
     private ActivityDetailBinding binding;
     private String machineId;
@@ -59,6 +69,14 @@ public class DetailActivity extends AppCompatActivity {
                 }
             });
 
+            ImageDetailAdapter adapter = new ImageDetailAdapter(this, this);
+            binding.viewPager.setAdapter(adapter);
+            binding.viewPager.setOffscreenPageLimit(20);
+            new TabLayoutMediator(binding.tabDots, binding.viewPager, (tab, position) -> {
+
+            }).attach();
+
+
             viewModel.getImageList().observe(this, new Observer<List<Image>>() {
                 @Override
                 public void onChanged(List<Image> images) {
@@ -66,7 +84,14 @@ public class DetailActivity extends AppCompatActivity {
                         return;
                     }
 
-                    //TODO: implement view pager to load image based on machine id
+
+                    if(images.size()!=0){
+                        List<Uri> uriImage = new ArrayList<>();
+                        for(int i=0;i<images.size();i++){
+                            uriImage.add(Uri.parse(images.get(i).getPath()));
+                        }
+                        adapter.setList(uriImage);
+                    }
                 }
             });
 
@@ -108,6 +133,32 @@ public class DetailActivity extends AppCompatActivity {
                 }
             });
 
+
+            binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    binding.tabDots.selectTab(binding.tabDots.getTabAt(position), true);
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    super.onPageScrollStateChanged(state);
+                }
+            });
+
         }
+    }
+
+
+
+    @Override
+    public void onImageUriClicked(Uri item) {
+
     }
 }
