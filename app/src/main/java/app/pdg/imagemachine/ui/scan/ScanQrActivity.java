@@ -37,7 +37,6 @@ public class ScanQrActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
         binding.toolbar.setNavigationOnClickListener(view -> this.onBackPressed());
-        binding.cardMachine.setVisibility(View.GONE);
 
         viewModel = new ViewModelProvider(this).get(ScanViewModel.class);
 
@@ -67,14 +66,6 @@ public class ScanQrActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mCodeScanner.startPreview();
-            }
-        });
-
-        binding.cardMachine.setOnClickListener(view -> {
-            if(mMachine!=null){
-                Intent intent = new Intent(this, DetailActivity.class);
-                intent.putExtra(DetailActivity.MACHINE_ID, mMachine.getId().toString());
-                startActivity(intent);
             }
         });
 
