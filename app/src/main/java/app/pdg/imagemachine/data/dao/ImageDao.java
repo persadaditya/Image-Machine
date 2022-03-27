@@ -18,6 +18,9 @@ public interface ImageDao {
     @Query("Select * From image Where machine_id = :id")
     LiveData<List<Image>> getImageListByMachineId(UUID id);
 
+    @Query("Select * From image where id = :id")
+    LiveData<Image> getImageById(UUID id);
+
     @Insert
     void insertImage(Image image);
 

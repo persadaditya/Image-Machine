@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import app.pdg.imagemachine.data.model.Image;
 import app.pdg.imagemachine.databinding.ItemImageBinding;
 import app.pdg.imagemachine.databinding.ItemImageDetailBinding;
 
@@ -21,7 +22,7 @@ public class ImageDetailAdapter extends
     private static final String TAG = ImageDetailAdapter.class.getSimpleName();
 
     private Context context;
-    private List<Uri> list;
+    private List<Image> list;
     private ImageUriCallback mAdapterCallback;
 
 
@@ -43,8 +44,8 @@ public class ImageDetailAdapter extends
     @Override
     public void onBindViewHolder(@NotNull ViewHolder holder, int position) {
 
-        Uri item = list.get(position);
-        holder.binding.ivMachine.setImageURI(item);
+        Image item = list.get(position);
+        holder.binding.ivMachine.setImageURI(Uri.parse(item.getPath()));
 
         if(mAdapterCallback!=null){
             holder.itemView.setOnClickListener(view -> {
@@ -69,7 +70,7 @@ public class ImageDetailAdapter extends
         notifyItemRangeRemoved(0, size);
     }
 
-    public void setList(List<Uri> list) {
+    public void setList(List<Image> list) {
         this.list = list;
         notifyDataSetChanged();
     }
@@ -85,6 +86,6 @@ public class ImageDetailAdapter extends
     }
 
     public interface ImageUriCallback {
-        void onImageUriClicked(Uri item);
+        void onImageUriClicked(Image item);
     }
 }

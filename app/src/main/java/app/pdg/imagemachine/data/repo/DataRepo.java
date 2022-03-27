@@ -124,6 +124,10 @@ public class DataRepo {
         });
     }
 
+    public LiveData<Image> getImageById(UUID uuid){
+        return myDatabase.imageDao().getImageById(uuid);
+    }
+
     public void deleteImage(Image image){
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override

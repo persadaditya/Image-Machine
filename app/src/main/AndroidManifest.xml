@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ImageMachine" >
         <activity
-            android:name=".ui.ImageActivity"
+            android:name=".ui.image.ImageActivity"
             android:exported="false" />
         <activity
             android:name=".ui.scan.ScanQrActivity"

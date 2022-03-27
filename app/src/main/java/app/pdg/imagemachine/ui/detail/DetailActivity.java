@@ -32,6 +32,7 @@ import app.pdg.imagemachine.data.model.Image;
 import app.pdg.imagemachine.data.model.Machine;
 import app.pdg.imagemachine.databinding.ActivityDetailBinding;
 import app.pdg.imagemachine.ui.addedit.AddEditMachineActivity;
+import app.pdg.imagemachine.ui.image.ImageActivity;
 
 public class DetailActivity extends AppCompatActivity implements ImageDetailAdapter.ImageUriCallback {
     public static final String MACHINE_ID = "dataMachineIdKey";
@@ -84,13 +85,8 @@ public class DetailActivity extends AppCompatActivity implements ImageDetailAdap
                         return;
                     }
 
-
-                    if(images.size()!=0){
-                        List<Uri> uriImage = new ArrayList<>();
-                        for(int i=0;i<images.size();i++){
-                            uriImage.add(Uri.parse(images.get(i).getPath()));
-                        }
-                        adapter.setList(uriImage);
+                    if(images.size()>0){
+                        adapter.setList(images);
                     }
                 }
             });
@@ -100,7 +96,7 @@ public class DetailActivity extends AppCompatActivity implements ImageDetailAdap
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     if(item.getItemId()==R.id.action_edit){
-                        //TODO: Implement edit mode
+                        //DONE: Implement edit mode
                         Intent intent = new Intent(getApplicationContext(), AddEditMachineActivity.class);
                         intent.putExtra(AddEditMachineActivity.DATA_ADD_EDIT, machineId);
                         startActivity(intent);
@@ -158,7 +154,10 @@ public class DetailActivity extends AppCompatActivity implements ImageDetailAdap
 
 
     @Override
-    public void onImageUriClicked(Uri item) {
-
+    public void onImageUriClicked(Image item) {
+        Intent intent = new Intent(this, ImageActivity.class);
+        intent.putExtra(ImageActivity.DATA_IMAGE, item.getId().toString());
+        intent.putExtra(ImageActivity.DATA_TITLE, mMachine.getName());
+        startActivity(intent);
     }
 }
