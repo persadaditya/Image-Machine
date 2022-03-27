@@ -11,7 +11,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         app:menu="@menu/image_menu"
         />
 

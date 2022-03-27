@@ -14,7 +14,7 @@
         app:title="Scan Qr Machine"
         android:clipToPadding="true"
         app:subtitle="Get machine info just scan qr code"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         />
 
     <com.budiyev.android.codescanner.CodeScannerView
