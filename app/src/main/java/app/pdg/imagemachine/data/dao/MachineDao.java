@@ -38,6 +38,6 @@ public interface MachineDao {
     @Update
     void updateMachine(Machine machine);
 
-    @Delete
+    @Delete()
     void deleteMachine(Machine machine);
 }

@@ -7,14 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.UUID;
 
 @Entity(tableName = "image",
         foreignKeys = @ForeignKey(entity = Machine.class,
-                parentColumns = "id", childColumns = "machine_id"))
+                parentColumns = "id", childColumns = "machine_id",
+                onDelete = ForeignKey.CASCADE,
+                onUpdate = ForeignKey.CASCADE
+        ))
 public class Image implements Parcelable {
     @PrimaryKey
     @NonNull

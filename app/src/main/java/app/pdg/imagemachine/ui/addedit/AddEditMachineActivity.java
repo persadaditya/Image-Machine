@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import app.pdg.imagemachine.R;
+import app.pdg.imagemachine.Utils;
 import app.pdg.imagemachine.data.model.Image;
 import app.pdg.imagemachine.data.model.Machine;
 import app.pdg.imagemachine.databinding.ActivityAddEditMachineBinding;
@@ -38,7 +40,8 @@ public class AddEditMachineActivity extends AppCompatActivity implements
     private Boolean isAdd = null;
     private Date date;
     private UUID uuid;
-    private List<Uri> uriListImage;
+    private List<Uri> uriListImage = new ArrayList<>();
+    private String machineId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +49,14 @@ public class AddEditMachineActivity extends AppCompatActivity implements
         binding = ActivityAddEditMachineBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         binding.toolbar.setNavigationOnClickListener(view -> onBackPressed());
-        Machine machine = null;
 
         if(getIntent().hasExtra(DATA_ADD_EDIT)){
             //edit mode
             isAdd = false;
             binding.toolbar.setTitle("Update Machine");
-            machine = getIntent().getParcelableExtra(DATA_ADD_EDIT);
-            uuid = machine.getId();
+            binding.btnAddUpdate.setText("Update Machine");
+            machineId = getIntent().getStringExtra(DATA_ADD_EDIT);
+            uuid = UUID.fromString(machineId);
         } else {
             //add mode
             isAdd = true;
@@ -62,9 +65,44 @@ public class AddEditMachineActivity extends AppCompatActivity implements
         }
 
         AddEditViewModel.Factory factory = new AddEditViewModel.Factory(getApplication(),
-                machine != null ? machine.getId() : null);
+                machineId != null ? uuid : null);
         AddEditViewModel viewModel = new ViewModelProvider(this, factory)
                 .get(AddEditViewModel.class);
+
+        ImageAddAdapter addAdapter = new ImageAddAdapter(this, this);
+        binding.rvImage.setLayoutManager(new GridLayoutManager(this, 5));
+        binding.rvImage.setAdapter(addAdapter);
+
+        if(!isAdd){
+            viewModel.getMachineLiveData().observe(this, new Observer<Machine>() {
+                @Override
+                public void onChanged(Machine machine) {
+                    if(machine==null){
+                        return;
+                    }
+
+                    binding.tieName.setText(machine.getName());
+                    binding.tieNumber.setText(String.valueOf(machine.getQrNumber()));
+                    binding.tieType.setText(machine.getMachineType());
+                    binding.tieMaintenance.setText(Utils.formatDate(machine.getLastMaintenanceDate()));
+                }
+            });
+
+            viewModel.getImageLiveData().observe(this, new Observer<List<Image>>() {
+                @Override
+                public void onChanged(List<Image> images) {
+                    if(images==null){
+                        return;
+                    }
+
+                    for(int i=0;i<images.size();i++){
+                        Uri data = Uri.parse(images.get(i).getPath());
+                        uriListImage.add(data);
+                        addAdapter.setList(uriListImage);
+                    }
+                }
+            });
+        }
 
 
         binding.tieMaintenance.setOnClickListener(view -> {
@@ -83,31 +121,35 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                     .startMultiImage(new OnMultiSelectedListener() {
                         @Override
                         public void onSelected(@NonNull List<? extends Uri> list) {
+
+                            //always refresh after add data
+                            List<Uri> data = new ArrayList<>(list);
                             if(isAdd){
-                                viewModel.setImagesPath(null); //always refresh after add data
-                                List<Uri> data = new ArrayList<>(list);
                                 viewModel.setImagesPath(data);
                             } else {
-
+                                data.removeAll(uriListImage);
+                                uriListImage.addAll(data);
+                                addAdapter.setList(uriListImage);
                             }
 
                         }
                     });
         });
 
-        ImageAddAdapter addAdapter = new ImageAddAdapter(this, this);
-        binding.rvImage.setLayoutManager(new GridLayoutManager(this, 5));
-        binding.rvImage.setAdapter(addAdapter);
+
 
         viewModel.getPathImage().observe(this, new Observer<List<Uri>>() {
             @Override
             public void onChanged(List<Uri> uris) {
-
                 if(uris==null){
                     return;
                 }
-
                 addAdapter.setList(uris);
+                if(isAdd){
+                    uriListImage = uris;
+                } else {
+                    uriListImage.addAll(uris);
+                }
             }
         });
 
@@ -138,13 +180,22 @@ public class AddEditMachineActivity extends AppCompatActivity implements
             //for add
             if(isAdd){
                 for(int i=0; i<uriListImage.size();i++){
-                    String path = uriListImage.get(i).getPath();
+                    String path = uriListImage.get(i).toString();
+                    Log.d("aap", "listPath:" + path);
                     Image image = new Image(UUID.randomUUID(), path, uuid);
                     viewModel.insertImage(image);
                 }
             } else {
                 //TODO: implement update image
+                for(int i=0; i<uriListImage.size();i++){
+                    String path = uriListImage.get(i).toString();
+                    Log.d("aap", "listPath:" + path);
+                    Image image = new Image(UUID.randomUUID(), path, uuid);
+                    viewModel.insertImage(image);
+                }
             }
+
+            onBackPressed();
         });
 
 

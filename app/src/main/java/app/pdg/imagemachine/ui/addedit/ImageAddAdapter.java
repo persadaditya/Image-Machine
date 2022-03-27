@@ -1,12 +1,16 @@
 package app.pdg.imagemachine.ui.addedit;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -17,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 
+import app.pdg.imagemachine.R;
 import app.pdg.imagemachine.databinding.ItemImageBinding;
 
 public class ImageAddAdapter extends
@@ -49,10 +54,7 @@ public class ImageAddAdapter extends
 
         try{
             Uri item = list.get(position);
-            Log.d("aap", "path:" + item.getPath());
-            Glide.with(context)
-                    .load(item)
-                    .into(holder.binding.ivMachine);
+            holder.binding.ivMachine.setImageURI(item);
 
 
             if(mAdapterCallback!=null){

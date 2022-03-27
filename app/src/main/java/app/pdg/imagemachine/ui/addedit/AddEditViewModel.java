@@ -26,6 +26,7 @@ public class AddEditViewModel extends AndroidViewModel {
     private final DataRepo dataRepo;
     private final UUID machineId;
     private LiveData<List<Image>> imageLiveData;
+    private LiveData<Machine> machineLiveData;
     private final LiveData<Machine> latestMachine;
 
     private final MutableLiveData<Boolean> isAddData = new MutableLiveData<>(null);
@@ -38,6 +39,7 @@ public class AddEditViewModel extends AndroidViewModel {
         this.machineId = machineId;
         if(machineId!=null){
             imageLiveData = dataRepo.getImageByMachineId(machineId);
+            machineLiveData = dataRepo.getMachineById(machineId);
         }
 
         latestMachine = dataRepo.getLatestMachine();
@@ -53,6 +55,10 @@ public class AddEditViewModel extends AndroidViewModel {
 
     public LiveData<List<Image>> getImageLiveData() {
         return imageLiveData;
+    }
+
+    public LiveData<Machine> getMachineLiveData() {
+        return machineLiveData;
     }
 
     public LiveData<Machine> getLatestMachine() {

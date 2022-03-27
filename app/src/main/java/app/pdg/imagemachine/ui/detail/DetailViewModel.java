@@ -18,12 +18,14 @@ import app.pdg.imagemachine.data.repo.DataRepo;
 
 public class DetailViewModel extends AndroidViewModel {
 
+    private final DataRepo dataRepo;
     private final LiveData<List<Image>> imageList;
     private final LiveData<Machine> machineLiveData;
 
     public DetailViewModel(@NonNull Application application, DataRepo dataRepo, UUID id) {
         super(application);
 
+        this.dataRepo = dataRepo;
         imageList = dataRepo.getImageByMachineId(id);
         machineLiveData = dataRepo.getMachineById(id);
     }
@@ -34,6 +36,10 @@ public class DetailViewModel extends AndroidViewModel {
 
     public LiveData<Machine> getMachineLiveData() {
         return machineLiveData;
+    }
+
+    public void deleteMachine(Machine machine){
+        dataRepo.deleteMachine(machine);
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {

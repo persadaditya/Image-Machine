@@ -15,7 +15,7 @@ import app.pdg.imagemachine.data.dao.MachineDao;
 import app.pdg.imagemachine.data.model.Image;
 import app.pdg.imagemachine.data.model.Machine;
 
-@Database(entities = {Machine.class, Image.class}, version = 1)
+@Database(entities = {Machine.class, Image.class}, version = 2)
 @TypeConverters(value = {DateConverter.class, UUIDConverter.class})
 public abstract class MyDatabase extends RoomDatabase {
     private static final String LOG_TAG = MyDatabase.class.getSimpleName();
@@ -31,6 +31,7 @@ public abstract class MyDatabase extends RoomDatabase {
                 Log.d(LOG_TAG, "Creating new database instance");
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         MyDatabase.class, MyDatabase.DATABASE_NAME)
+                        .fallbackToDestructiveMigrationFrom(1)
                         .build();
 
                 MyDatabase database = MyDatabase.getInstance(context);
