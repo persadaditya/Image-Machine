@@ -179,23 +179,17 @@ public class AddEditMachineActivity extends AppCompatActivity implements
             Machine addMachine = new Machine(uuid, name, type, number, date.getTime(), now);
             viewModel.insertUpdate(addMachine);
 
-            //for add
-            if(isAdd){
-                for(int i=0; i<uriListImage.size();i++){
-                    String path = uriListImage.get(i).toString();
-                    Log.d("aap", "listPath:" + path);
-                    Image image = new Image(UUID.randomUUID(), path, uuid);
-                    viewModel.insertImage(image);
-                }
-            } else {
+            //for update images
+            if(!isAdd){
                 //if data had already in our db remove it first
                 uriListImage.removeAll(uriUpdateDb);
-                for(int i=0; i<uriListImage.size();i++){
-                    String path = uriListImage.get(i).toString();
-                    Log.d("aap", "listPath:" + path);
-                    Image image = new Image(UUID.randomUUID(), path, uuid);
-                    viewModel.insertImage(image);
-                }
+            }
+
+            for(int i=0; i<uriListImage.size();i++){
+                String path = uriListImage.get(i).toString();
+                Log.d("aap", "listPath:" + path);
+                Image image = new Image(UUID.randomUUID(), path, uuid);
+                viewModel.insertImage(image);
             }
 
             onBackPressed();
