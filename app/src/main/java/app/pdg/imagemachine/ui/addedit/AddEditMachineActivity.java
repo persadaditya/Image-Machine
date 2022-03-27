@@ -38,9 +38,10 @@ public class AddEditMachineActivity extends AppCompatActivity implements
     private ActivityAddEditMachineBinding binding;
     public static final String DATA_ADD_EDIT = "addEditKey";
     private Boolean isAdd = null;
-    private Date date;
+    private Calendar date;
     private UUID uuid;
     private List<Uri> uriListImage = new ArrayList<>();
+    private List<Uri> uriUpdateDb = new ArrayList<>();
     private String machineId = null;
 
     @Override
@@ -98,6 +99,7 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                     for(int i=0;i<images.size();i++){
                         Uri data = Uri.parse(images.get(i).getPath());
                         uriListImage.add(data);
+                        uriUpdateDb.add(data);
                         addAdapter.setList(uriListImage);
                     }
                 }
@@ -174,7 +176,7 @@ public class AddEditMachineActivity extends AppCompatActivity implements
             int number = Integer.parseInt(binding.tieNumber.getText().toString());
             Date now = Calendar.getInstance().getTime();
 
-            Machine addMachine = new Machine(uuid, name, type, number, date, now);
+            Machine addMachine = new Machine(uuid, name, type, number, date.getTime(), now);
             viewModel.insertUpdate(addMachine);
 
             //for add
@@ -186,7 +188,8 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                     viewModel.insertImage(image);
                 }
             } else {
-                //TODO: implement update image
+                //if data had already in our db remove it first
+                uriListImage.removeAll(uriUpdateDb);
                 for(int i=0; i<uriListImage.size();i++){
                     String path = uriListImage.get(i).toString();
                     Log.d("aap", "listPath:" + path);
@@ -201,10 +204,10 @@ public class AddEditMachineActivity extends AppCompatActivity implements
 
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        date = new Date(year, monthOfYear, dayOfMonth);
+        date = Calendar.getInstance();
+        date.set(year, monthOfYear, dayOfMonth);
         binding.tieMaintenance.setText(String.format("%s-%s-%s", year, monthOfYear+1, dayOfMonth));
     }
 

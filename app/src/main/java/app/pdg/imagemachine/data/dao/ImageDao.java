@@ -18,7 +18,7 @@ public interface ImageDao {
     @Query("Select * From image Where machine_id = :id")
     LiveData<List<Image>> getImageListByMachineId(UUID id);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     void insertImage(Image image);
 
     @Delete
