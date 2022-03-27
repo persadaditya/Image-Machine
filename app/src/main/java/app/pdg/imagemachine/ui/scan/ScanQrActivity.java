@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -14,14 +15,18 @@ import com.budiyev.android.codescanner.DecodeCallback;
 import com.google.zxing.Result;
 
 import app.pdg.imagemachine.R;
+import app.pdg.imagemachine.Utils;
 import app.pdg.imagemachine.data.model.Machine;
 import app.pdg.imagemachine.databinding.ActivityScanQrBinding;
+import app.pdg.imagemachine.ui.detail.DetailActivity;
 import app.pdg.imagemachine.ui.main.MainActivity;
 
 public class ScanQrActivity extends AppCompatActivity {
 
     private ActivityScanQrBinding binding;
     private CodeScanner mCodeScanner;
+    private Machine mMachine;
+    private ScanViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +37,9 @@ public class ScanQrActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
         binding.toolbar.setNavigationOnClickListener(view -> this.onBackPressed());
+        binding.cardMachine.setVisibility(View.GONE);
 
-        ScanViewModel viewModel = new ViewModelProvider(this).get(ScanViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ScanViewModel.class);
 
         mCodeScanner = new CodeScanner(this, binding.scannerView);
         mCodeScanner.setDecodeCallback(new DecodeCallback() {
@@ -47,7 +53,9 @@ public class ScanQrActivity extends AppCompatActivity {
                             viewModel.loadMachineData(code);
                             subscribeToViewModel(viewModel);
                         } catch (Exception e) {
-                            Toast.makeText(getApplicationContext(), result.getText(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Invalid number detected",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     }
 
@@ -62,7 +70,13 @@ public class ScanQrActivity extends AppCompatActivity {
             }
         });
 
-
+        binding.cardMachine.setOnClickListener(view -> {
+            if(mMachine!=null){
+                Intent intent = new Intent(this, DetailActivity.class);
+                intent.putExtra(DetailActivity.MACHINE_ID, mMachine.getId().toString());
+                startActivity(intent);
+            }
+        });
 
 
     }
@@ -72,10 +86,17 @@ public class ScanQrActivity extends AppCompatActivity {
             @Override
             public void onChanged(Machine machine) {
                 if (machine==null){
+                    Toast.makeText(getApplicationContext(), "machine is not on database",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
                     return;
                 }
 
-                //TODO: bind data if qr has already in our database
+
+                Intent intent = new Intent(ScanQrActivity.this, DetailActivity.class);
+                intent.putExtra(DetailActivity.MACHINE_ID, machine.getId().toString());
+                startActivity(intent);
+
 
             }
         });
