@@ -183,60 +183,6 @@ public class Utils {
     }
 
 
-    public static void createFolder() {
-        File EXPORT_REALM_PATH = new File(Environment.getExternalStorageDirectory() + File.separator + "/ScoutsDB/Databases/");
-        if (!EXPORT_REALM_PATH.exists() && !EXPORT_REALM_PATH.isDirectory()) {
-            if (EXPORT_REALM_PATH.mkdirs()) {
-                Log.i("CreateDir", "App dir created");
-            } else {
-                Log.w("CreateDir", "Unable to create app dir!");
-            }
-        } else {
-            Log.i("CreateDir", "App dir already exists");
-        }
-    }
-
-    public static void createFolderPictures() {
-        File EXPORT_REALM_PATH = new File(Environment.getExternalStorageDirectory() + File.separator + "/ScoutsDB/Pictures/");
-        if (!EXPORT_REALM_PATH.exists() && !EXPORT_REALM_PATH.isDirectory()) {
-            if (EXPORT_REALM_PATH.mkdirs()) {
-                Log.i("CreateDir", "App dir created");
-            } else {
-                Log.w("CreateDir", "Unable to create app dir!");
-            }
-        } else {
-            Log.i("CreateDir", "App dir already exists");
-        }
-    }
-
-
-    public static void deleteBackup(String userCode, String branchCode) {
-        File EXPORT_REALM_PATH = new File(Environment.getExternalStorageDirectory() + File.separator + "/ScoutsDB/Databases/");
-        String EXPORT_REALM_FILE_NAME = "EMA" + userCode + branchCode + ".realm";
-        createFolder();
-        File file = new File(EXPORT_REALM_PATH, EXPORT_REALM_FILE_NAME);
-        boolean deleted = file.delete();
-        System.out.println(deleted);
-    }
-
-    private static String copyBundledRealmFile(Context context, String oldFilePath, String outFileName) {
-        try {
-            File file = new File(context.getApplicationContext().getFilesDir(), outFileName);
-            FileOutputStream outputStream = new FileOutputStream(file);
-            FileInputStream inputStream = new FileInputStream(new File(oldFilePath));
-            byte[] buf = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buf)) > 0) {
-                outputStream.write(buf, 0, bytesRead);
-            }
-            outputStream.close();
-            return file.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static void hideVirtualKeyboard(Context context, View v) {
         InputMethodManager keyboard = (InputMethodManager) context.getSystemService(
                 Context.INPUT_METHOD_SERVICE);
@@ -767,18 +713,6 @@ public class Utils {
         final InputStream imageStream = context.getContentResolver().openInputStream(imageUri);
         return BitmapFactory.decodeStream(imageStream);
     }
-
-//    public static String convertImageToBase64(Bitmap scaledBitmap) {
-//
-//        if (scaledBitmap == null) {
-//            return "";
-//        }
-//
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
-//        byte[] byteArray = byteArrayOutputStream.toByteArray();
-//        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-//    }
 
     public static String convertImageToBase64(Bitmap scaledBitmap) {
 

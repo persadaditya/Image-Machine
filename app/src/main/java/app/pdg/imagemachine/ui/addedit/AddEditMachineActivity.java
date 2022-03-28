@@ -138,13 +138,11 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                             } else {
                                 data.removeAll(uriListImage);
                                 uriListImage.addAll(data);
-                                Log.d("aap", "Size:" + uriListImage.size());
                                 if(uriListImage.size()>10){
                                     Toast.makeText(getApplicationContext(), "Last data will be remove, max 10 images",
                                             Toast.LENGTH_SHORT).show();
                                     uriListImage.subList(10, uriListImage.size()).clear();
 
-                                    Log.d("aap", "After Size:" + uriListImage.size());
                                 }
 
                                 addAdapter.setList(uriListImage);
