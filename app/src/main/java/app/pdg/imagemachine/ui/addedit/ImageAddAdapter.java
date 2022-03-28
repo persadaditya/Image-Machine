@@ -1,27 +1,18 @@
 package app.pdg.imagemachine.ui.addedit;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.bumptech.glide.Glide;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.List;
 
-import app.pdg.imagemachine.R;
 import app.pdg.imagemachine.databinding.ItemImageBinding;
 
 public class ImageAddAdapter extends
@@ -32,6 +23,7 @@ public class ImageAddAdapter extends
     private Context context;
     private List<Uri> list;
     private ImageUriCallback mAdapterCallback;
+    private boolean isAdd = true;
 
 
     public ImageAddAdapter(Context context, ImageUriCallback mAdapterCallback) {
@@ -56,10 +48,13 @@ public class ImageAddAdapter extends
             Uri item = list.get(position);
             holder.binding.ivMachine.setImageURI(item);
 
+            if(!isAdd){
+                holder.binding.btnCancel.setVisibility(View.GONE);
+            }
 
             if(mAdapterCallback!=null){
                 holder.binding.btnCancel.setOnClickListener(view -> {
-                    mAdapterCallback.onImageUriClicked(item);
+                    mAdapterCallback.onImageUriDeleteClicked(item);
                 });
             }
 
@@ -75,7 +70,7 @@ public class ImageAddAdapter extends
 
     @Override
     public int getItemCount() {
-        return list==null ? 0 : list.size();
+        return list==null ? 0 : Math.min(list.size(), 10);
     }
 
     public void clear() {
@@ -86,6 +81,11 @@ public class ImageAddAdapter extends
 
     public void setList(List<Uri> list) {
         this.list = list;
+        notifyDataSetChanged();
+    }
+
+    public void setIsAdd(boolean value){
+        isAdd = value;
         notifyDataSetChanged();
     }
 
@@ -100,6 +100,6 @@ public class ImageAddAdapter extends
     }
 
     public interface ImageUriCallback {
-        void onImageUriClicked(Uri item);
+        void onImageUriDeleteClicked(Uri item);
     }
 }

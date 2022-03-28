@@ -38,11 +38,12 @@ public class AddEditMachineActivity extends AppCompatActivity implements
     private ActivityAddEditMachineBinding binding;
     public static final String DATA_ADD_EDIT = "addEditKey";
     private Boolean isAdd = null;
-    private Calendar date;
+    private final Calendar date = Calendar.getInstance();
     private UUID uuid;
     private List<Uri> uriListImage = new ArrayList<>();
-    private List<Uri> uriUpdateDb = new ArrayList<>();
+    private final List<Uri> uriUpdateDb = new ArrayList<>();
     private String machineId = null;
+    private ImageAddAdapter addAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +71,10 @@ public class AddEditMachineActivity extends AppCompatActivity implements
         AddEditViewModel viewModel = new ViewModelProvider(this, factory)
                 .get(AddEditViewModel.class);
 
-        ImageAddAdapter addAdapter = new ImageAddAdapter(this, this);
+        addAdapter = new ImageAddAdapter(this, this);
         binding.rvImage.setLayoutManager(new GridLayoutManager(this, 5));
         binding.rvImage.setAdapter(addAdapter);
+        addAdapter.setIsAdd(isAdd);
 
         if(!isAdd){
             viewModel.getMachineLiveData().observe(this, new Observer<Machine>() {
@@ -81,11 +83,11 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                     if(machine==null){
                         return;
                     }
-
                     binding.tieName.setText(machine.getName());
                     binding.tieNumber.setText(String.valueOf(machine.getQrNumber()));
                     binding.tieType.setText(machine.getMachineType());
                     binding.tieMaintenance.setText(Utils.formatDate(machine.getLastMaintenanceDate()));
+                    date.setTime(machine.getLastMaintenanceDate());
                 }
             });
 
@@ -119,6 +121,11 @@ public class AddEditMachineActivity extends AppCompatActivity implements
         });
 
         binding.btnAddImage.setOnClickListener(view -> {
+            if(uriListImage.size()>9){
+                Toast.makeText(getApplicationContext(), "Max image 10", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             TedImagePicker.with(this)
                     .startMultiImage(new OnMultiSelectedListener() {
                         @Override
@@ -131,6 +138,15 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                             } else {
                                 data.removeAll(uriListImage);
                                 uriListImage.addAll(data);
+                                Log.d("aap", "Size:" + uriListImage.size());
+                                if(uriListImage.size()>10){
+                                    Toast.makeText(getApplicationContext(), "Last data will be remove, max 10 images",
+                                            Toast.LENGTH_SHORT).show();
+                                    uriListImage.subList(10, uriListImage.size()).clear();
+
+                                    Log.d("aap", "After Size:" + uriListImage.size());
+                                }
+
                                 addAdapter.setList(uriListImage);
                             }
 
@@ -185,7 +201,10 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                 uriListImage.removeAll(uriUpdateDb);
             }
 
-            for(int i=0; i<uriListImage.size();i++){
+            ///maximal 10 images
+            int size = Math.min(uriListImage.size(), 10);
+
+            for(int i=0; i<size;i++){
                 String path = uriListImage.get(i).toString();
                 Log.d("aap", "listPath:" + path);
                 Image image = new Image(UUID.randomUUID(), path, uuid);
@@ -200,7 +219,6 @@ public class AddEditMachineActivity extends AppCompatActivity implements
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        date = Calendar.getInstance();
         date.set(year, monthOfYear, dayOfMonth);
         binding.tieMaintenance.setText(String.format("%s-%s-%s", year, monthOfYear+1, dayOfMonth));
     }
@@ -211,7 +229,10 @@ public class AddEditMachineActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onImageUriClicked(Uri item) {
-
+    public void onImageUriDeleteClicked(Uri item) {
+        if(isAdd){
+            uriListImage.remove(item);
+            addAdapter.setList(uriListImage);
+        }
     }
 }
