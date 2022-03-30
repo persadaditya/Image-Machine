@@ -135,8 +135,7 @@ public class AddEditMachineActivity extends AppCompatActivity implements
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA},
                         CAMERA_PERMISSION);
-            } else {
-                startActivity(new Intent(getApplicationContext(), ScanQrActivity.class));
+                return;
             }
 
             if(uriListImage.size()>9){
