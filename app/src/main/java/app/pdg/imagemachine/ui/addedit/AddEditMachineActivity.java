@@ -2,12 +2,17 @@ package app.pdg.imagemachine.ui.addedit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +34,7 @@ import app.pdg.imagemachine.data.model.Image;
 import app.pdg.imagemachine.data.model.Machine;
 import app.pdg.imagemachine.databinding.ActivityAddEditMachineBinding;
 import app.pdg.imagemachine.ui.main.MainActivity;
+import app.pdg.imagemachine.ui.scan.ScanQrActivity;
 import gun0912.tedimagepicker.builder.TedImagePicker;
 import gun0912.tedimagepicker.builder.listener.OnMultiSelectedListener;
 
@@ -44,6 +50,9 @@ public class AddEditMachineActivity extends AppCompatActivity implements
     private final List<Uri> uriUpdateDb = new ArrayList<>();
     private String machineId = null;
     private ImageAddAdapter addAdapter;
+    private AddEditViewModel viewModel;
+
+    public static final int CAMERA_PERMISSION = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +77,7 @@ public class AddEditMachineActivity extends AppCompatActivity implements
 
         AddEditViewModel.Factory factory = new AddEditViewModel.Factory(getApplication(),
                 machineId != null ? uuid : null);
-        AddEditViewModel viewModel = new ViewModelProvider(this, factory)
+        viewModel = new ViewModelProvider(this, factory)
                 .get(AddEditViewModel.class);
 
         addAdapter = new ImageAddAdapter(this, this);
@@ -121,35 +130,21 @@ public class AddEditMachineActivity extends AppCompatActivity implements
         });
 
         binding.btnAddImage.setOnClickListener(view -> {
+            if(ContextCompat.checkSelfPermission(getApplicationContext(),
+                    Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        CAMERA_PERMISSION);
+            } else {
+                startActivity(new Intent(getApplicationContext(), ScanQrActivity.class));
+            }
+
             if(uriListImage.size()>9){
                 Toast.makeText(getApplicationContext(), "Max image 10", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            TedImagePicker.with(this)
-                    .startMultiImage(new OnMultiSelectedListener() {
-                        @Override
-                        public void onSelected(@NonNull List<? extends Uri> list) {
-
-                            //always refresh after add data
-                            List<Uri> data = new ArrayList<>(list);
-                            if(isAdd){
-                                viewModel.setImagesPath(data);
-                            } else {
-                                data.removeAll(uriListImage);
-                                uriListImage.addAll(data);
-                                if(uriListImage.size()>10){
-                                    Toast.makeText(getApplicationContext(), "Last data will be remove, max 10 images",
-                                            Toast.LENGTH_SHORT).show();
-                                    uriListImage.subList(10, uriListImage.size()).clear();
-
-                                }
-
-                                addAdapter.setList(uriListImage);
-                            }
-
-                        }
-                    });
+            openImagePicker();
         });
 
 
@@ -213,6 +208,45 @@ public class AddEditMachineActivity extends AppCompatActivity implements
         });
 
 
+    }
+
+    private void openImagePicker(){
+        TedImagePicker.with(this)
+                .startMultiImage(new OnMultiSelectedListener() {
+                    @Override
+                    public void onSelected(@NonNull List<? extends Uri> list) {
+
+                        //always refresh after add data
+                        List<Uri> data = new ArrayList<>(list);
+                        if(isAdd){
+                            viewModel.setImagesPath(data);
+                        } else {
+                            data.removeAll(uriListImage);
+                            uriListImage.addAll(data);
+                            if(uriListImage.size()>10){
+                                Toast.makeText(getApplicationContext(), "Last data will be remove, max 10 images",
+                                        Toast.LENGTH_SHORT).show();
+                                uriListImage.subList(10, uriListImage.size()).clear();
+
+                            }
+
+                            addAdapter.setList(uriListImage);
+                        }
+
+                    }
+                });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openImagePicker();
+            } else {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
